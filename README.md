@@ -53,3 +53,18 @@ completado el analisis de alcance ni la remediacion. Las pruebas funcionales no
 constituyen una validacion de seguridad de las dependencias.
 
 Estrategia del taller: `feature/*` -> `develop` -> `main`, con Pull Requests.
+
+
+## Automatizacion preparada para el laboratorio
+
+Ver `docs/LABORATORIO.md` para ejecutar la demostracion local con un unico JAR
+en DEV, QA y PDN. `GET /api/v1/hello` muestra ambiente, version y commit.
+La identidad de la version se incorpora al JAR durante el build y no cambia por ambiente.
+
+`azure-pipelines.yml` prepara CI y CD en Azure App Service, con despliegues desactivados
+por defecto hasta configurar recursos, secretos y la aprobacion del ambiente PDN.
+`.github/workflows/ci.yml` proporciona CI complementaria en GitHub Actions.
+No se debe presentar una ejecucion de GitHub o Docker como evidencia de Azure.
+
+La ampliacion incorpora cuatro casos de prueba: se esperan 24 pruebas Java y 13 Angular.
+Ese nuevo total debe confirmarse al ejecutar el build de esta rama.
