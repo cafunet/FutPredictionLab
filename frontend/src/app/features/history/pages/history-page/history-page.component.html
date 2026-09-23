@@ -1,0 +1,116 @@
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in-up">
+  <!-- Header + Stats -->
+  <div class="mb-8 border-b border-gray-200 pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+    <div>
+      <h2 class="text-3xl font-extrabold text-[#063b27]">Mi Historial Predictivo</h2>
+      <p class="text-gray-500 mt-1 text-sm">
+        Usuario: <span class="font-bold">{{ auth.displayName() }}</span> | Auditoría de aciertos y análisis guardados.
+      </p>
+    </div>
+
+    @if (stats()) {
+      <div class="flex gap-4">
+        <app-stat-card [value]="stats()!.accuracyRate + '%'" label="Tasa Acierto" color="primary" />
+        <app-stat-card [value]="stats()!.correct" label="Acertadas" color="success" />
+        <app-stat-card [value]="stats()!.failed" label="Fallidas" color="danger" />
+      </div>
+    }
+  </div>
+
+  <!-- Tabla -->
+  <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Fecha del partido</th>
+            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Partido Oficial</th>
+            <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Tu Predicción IA</th>
+            <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Resultado Real</th>
+            <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Estado / Precisión</th>
+            <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          @if (history().length === 0) {
+            <tr>
+              <td colspan="6" class="px-6 py-16 text-center text-gray-500">
+                <div class="flex flex-col items-center justify-center">
+                  <div class="text-5xl mb-4 opacity-50">📭</div>
+                  <h3 class="text-lg font-bold text-gray-700">Aún no tienes predicciones</h3>
+                  <p class="text-sm mt-1">Dirígete a la sección de partidos y guarda una nueva predicción con IA para verla aquí.</p>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (item of history(); track item.id) {
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-semibold text-gray-800">{{ getFormattedDate(item.date) }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-bold text-gray-800">{{ item.match }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-50 text-blue-800 border border-blue-100">
+                    {{ item.predicted }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <span class="text-sm font-bold text-gray-600">{{ item.result || 'Pendiente' }}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  @if (item.status === 'ACERTADA') {
+                    <div class="flex flex-col items-center">
+                      <span class="text-emerald-500 font-bold text-sm flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        ACERTADA
+                      </span>
+                      <span class="text-[10px] text-gray-400">Precisión IA: {{ item.accuracy }}%</span>
+                    </div>
+                  } @else if (item.status === 'FALLIDA') {
+                    <span class="text-red-500 font-bold text-sm flex items-center justify-center gap-1">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                      </svg>
+                      FALLIDA
+                    </span>
+                  } @else {
+                    <span class="text-gray-500 font-bold text-sm italic">EN ESPERA</span>
+                  }
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button (click)="openDetail(item)"
+                            class="text-[#063b27] hover:text-emerald-800 p-2 rounded-lg hover:bg-emerald-50 transition-colors inline-flex items-center justify-center"
+                            title="Ver detalle">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    <button (click)="deletePrediction(item.id)" 
+                            class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors inline-flex items-center justify-center" 
+                            title="Eliminar predicción">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+@if (selectedItem()) {
+  <app-prediction-history-detail-modal
+    [item]="selectedItem()!"
+    (closed)="closeDetail()" />
+}

@@ -1,0 +1,87 @@
+<ng-template #liveCardTpl let-match="match" let-inSlider="inSlider">
+  <article class="live-card" [class.live-slider__slide]="inSlider">
+    <div class="live-card__header">
+      <span class="live-card__phase">{{ match.fase || 'Partido en vivo' }}</span>
+      <span class="live-card__badge" [class.live-card__badge--halftime]="match.halftimeBreak">
+        @if (!match.halftimeBreak) {
+          <span class="live-card__pulse"></span>
+        }
+        {{ liveBadge(match) }}
+      </span>
+    </div>
+
+    <div class="live-card__body">
+      <div class="live-card__team" (click)="onTeamClick(match.local)">
+        @if (match.localBanderaUrl) {
+          <img class="live-card__flag-img" [src]="match.localBanderaUrl" [alt]="match.local" />
+        } @else {
+          <span class="live-card__flag-emoji">{{ match.localFlag }}</span>
+        }
+        <span class="live-card__name">{{ match.local }}</span>
+      </div>
+
+      <div class="live-card__score">
+        <span>{{ match.localScore }}</span>
+        <span class="live-card__sep">–</span>
+        <span>{{ match.visitorScore }}</span>
+      </div>
+
+      <div class="live-card__team" (click)="onTeamClick(match.visitor)">
+        @if (match.visitorBanderaUrl) {
+          <img class="live-card__flag-img" [src]="match.visitorBanderaUrl" [alt]="match.visitor" />
+        } @else {
+          <span class="live-card__flag-emoji">{{ match.visitorFlag }}</span>
+        }
+        <span class="live-card__name">{{ match.visitor }}</span>
+      </div>
+    </div>
+
+    <div class="live-card__events">
+      @if (match.events?.length) {
+        @for (event of match.events!; track event.id ?? event.minute + event.text) {
+          <div class="live-card__event">
+            <span class="live-card__event-min">{{ event.minute }}'</span>
+            <span class="live-card__event-icon">{{ eventIcon(event.type) }}</span>
+            <span class="live-card__event-text">{{ event.text }}</span>
+          </div>
+        }
+      } @else {
+        <p class="live-card__events-empty">Sin eventos registrados</p>
+      }
+    </div>
+  </article>
+</ng-template>
+
+@if (hasMatches()) {
+  @if (total() === 1) {
+    <div class="live-single">
+      <ng-container
+        *ngTemplateOutlet="liveCardTpl; context: { match: matchList()[0], inSlider: false }" />
+    </div>
+  } @else {
+    <div class="live-slider">
+      <button type="button" class="live-slider__nav live-slider__nav--prev" (click)="scroll(-1)"
+        aria-label="Partidos anteriores">‹</button>
+
+      <div class="live-slider__viewport">
+        <div class="live-slider__track" #track>
+          @for (match of matchList(); track match.id) {
+            <ng-container
+              *ngTemplateOutlet="liveCardTpl; context: { match: match, inSlider: true }" />
+          }
+        </div>
+      </div>
+
+      <button type="button" class="live-slider__nav live-slider__nav--next" (click)="scroll(1)"
+        aria-label="Siguientes partidos">›</button>
+
+      <p class="live-slider__hint">{{ total() }} partidos en vivo — desliza para ver más</p>
+    </div>
+  }
+} @else {
+  <div class="live-single">
+    <div class="live-card live-card--empty">
+      <p>No hay partidos en vivo en este momento.</p>
+    </div>
+  </div>
+}

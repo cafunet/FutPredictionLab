@@ -1,0 +1,93 @@
+<!-- Hero + Live Widget -->
+<div class="relative bg-gradient-to-br from-[#063b27] to-[#0a5c3e] overflow-hidden">
+  <div class="absolute inset-0 opacity-10 pattern-dots text-white"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 flex flex-col md:flex-row items-center">
+    <div class="md:w-1/2">
+      <app-hero-section />
+    </div>
+    <div class="md:w-1/2 w-full min-w-0">
+      <app-live-widget [matches]="liveMatches()" (teamClicked)="openTeamDetails($event)" />
+    </div>
+  </div>
+</div>
+
+<!-- Tabs de Navegación -->
+<div class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex space-x-8">
+      <button (click)="homeTab.set('CALENDAR')"
+        class="py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
+        [class]="homeTab() === 'CALENDAR' ? 'border-[#063b27] text-[#063b27]' : 'border-transparent text-gray-500'">
+        📅 Calendario
+      </button>
+      <button (click)="homeTab.set('GROUPS')"
+        class="py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
+        [class]="homeTab() === 'GROUPS' ? 'border-[#063b27] text-[#063b27]' : 'border-transparent text-gray-500'">
+        📊 Fase de Grupos
+      </button>
+      <button (click)="homeTab.set('BRACKET')"
+        class="py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
+        [class]="homeTab() === 'BRACKET' ? 'border-[#063b27] text-[#063b27]' : 'border-transparent text-gray-500'">
+        🏆 Llaves (Fase Final)
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Contenido de Tabs -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  @if (loadError()) {
+    <p class="text-center text-red-600 text-sm mb-6">No se pudieron cargar equipos o partidos. Comprueba el API.</p>
+  }
+
+  <!-- TAB: CALENDARIO -->
+  @if (homeTab() === 'CALENDAR') {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up">
+      @for (match of calendarMatches(); track match.id) {
+        <app-match-card
+          [match]="match"
+          (viewDetails)="openMatchDetails($event)"
+          (requestPrediction)="requestPrediction($event)"
+          (teamClicked)="openTeamDetails($event)" />
+      }
+    </div>
+    @if (calendarMatches().length === 0 && !loadError()) {
+      <p class="text-center text-gray-500 py-8">No hay partidos programados en la base de datos.</p>
+    }
+  }
+
+  <!-- TAB: GRUPOS -->
+  @if (homeTab() === 'GROUPS') {
+    @if (groups().length === 0 && !loadError()) {
+      <p class="text-center text-gray-500 py-8">No hay equipos con grupo asignado. Crea equipos desde el panel admin.</p>
+    }
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in-up">
+      @for (group of groups(); track group) {
+        <app-group-standings
+          [group]="group"
+          [standings]="getStandingsForGroup(group)"
+          [liveUpdating]="groupHasLiveStandings(group)"
+          (teamClicked)="openTeamFromStanding($event)" />
+      }
+    </div>
+  }
+
+  <!-- TAB: LLAVES -->
+  @if (homeTab() === 'BRACKET') {
+    <app-bracket />
+  }
+</div>
+
+<!-- Modales -->
+@if (selectedMatchDetails()) {
+  <app-match-detail-modal
+    [match]="selectedMatchDetails()!"
+    (closed)="closeMatchDetails()"
+    (requestPrediction)="requestPrediction($event)" />
+}
+
+@if (selectedTeamDetails()) {
+  <app-team-detail-modal
+    [team]="selectedTeamDetails()!"
+    (closed)="closeTeamDetails()" />
+}

@@ -1,0 +1,56 @@
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+  <div class="bg-gray-50 border-b border-gray-200 px-4 py-3 flex justify-between items-center">
+    <h3 class="font-black text-lg text-[#063b27]">Grupo {{ group }}</h3>
+    @if (liveUpdating) {
+      <span class="text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 px-2 py-1 rounded-full animate-pulse">
+        ● En vivo
+      </span>
+    }
+  </div>
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-white">
+      <tr>
+        <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">País</th>
+        <th class="px-2 py-3 text-center text-[10px] font-bold text-[#063b27] uppercase tracking-wider" title="Puntos">PTS</th>
+        <th class="px-2 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider" title="Partidos Jugados">PJ</th>
+        <th class="px-2 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider" title="Partidos Ganados">PG</th>
+        <th class="px-2 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider" title="Partidos Empatados">PE</th>
+        <th class="px-2 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider" title="Partidos Perdidos">PP</th>
+        <th class="px-2 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider" title="Goles a Favor">GF</th>
+        <th class="px-2 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider" title="Goles en Contra">GC</th>
+        <th class="px-2 py-3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider" title="Diferencia de Goles">DG</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100">
+      @for (team of standings; track team.teamId ?? team.name; let i = $index) {
+        <tr class="hover:bg-gray-50 transition-colors" [class.bg-emerald-50/50]="i < 2">
+          <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center gap-2 cursor-pointer"
+            (click)="onTeamClick(team)">
+            <span class="text-gray-400 w-3 text-xs">{{ i + 1 }}</span>
+            @if (team.banderaUrl) {
+              <img [src]="team.banderaUrl" [alt]="team.name" class="w-7 h-5 object-cover rounded shadow-sm shrink-0">
+            } @else if (team.flag) {
+              <span class="text-xl leading-none">{{ team.flag }}</span>
+            }
+            <span class="hover:text-blue-600 transition-colors">{{ team.name }}</span>
+            @if (team.provisional) {
+              <span class="text-[9px] bg-red-100 text-red-600 px-1 rounded" title="Incluye partido en curso">LIVE</span>
+            }
+          </td>
+          <td class="px-2 py-3 whitespace-nowrap text-sm text-center font-black text-[#063b27]">
+            {{ team.pts }}@if (team.provisional) { <span class="text-red-500 text-[10px]">*</span> }
+          </td>
+          <td class="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-500 font-mono">{{ team.pj }}</td>
+          <td class="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-500 font-mono">{{ team.pg ?? 0 }}</td>
+          <td class="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-500 font-mono">{{ team.pe ?? 0 }}</td>
+          <td class="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-500 font-mono">{{ team.pp ?? 0 }}</td>
+          <td class="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-500 font-mono">{{ team.gf ?? 0 }}</td>
+          <td class="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-500 font-mono">{{ team.gc ?? 0 }}</td>
+          <td class="px-2 py-3 whitespace-nowrap text-sm text-center text-gray-500 font-mono">
+            {{ team.dg > 0 ? '+' + team.dg : team.dg }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

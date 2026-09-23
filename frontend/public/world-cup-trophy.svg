@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 200" role="img" aria-label="Copa del Mundo FIFA">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff4b0"/>
+      <stop offset="45%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#8a6d1a"/>
+    </linearGradient>
+    <linearGradient id="base" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#145a32"/>
+      <stop offset="100%" stop-color="#063b27"/>
+    </linearGradient>
+  </defs>
+  <!-- Base -->
+  <rect x="28" y="168" width="64" height="14" rx="3" fill="url(#base)"/>
+  <rect x="38" y="156" width="44" height="14" rx="2" fill="url(#base)" opacity="0.9"/>
+  <!-- Stem -->
+  <path d="M52 118 L52 156 L68 156 L68 118 Z" fill="url(#gold)"/>
+  <!-- Cup body -->
+  <path d="M34 48 C34 28 86 28 86 48 C86 78 72 96 60 118 C48 96 34 78 34 48 Z" fill="url(#gold)" stroke="#8a6d1a" stroke-width="1.5"/>
+  <!-- Handles -->
+  <path d="M34 52 C18 52 14 68 22 78" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M86 52 C102 52 106 68 98 78" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round"/>
+  <!-- Globe hint -->
+  <circle cx="60" cy="58" r="14" fill="#063b27" opacity="0.18"/>
+  <ellipse cx="60" cy="58" rx="14" ry="8" fill="none" stroke="#063b27" stroke-width="1" opacity="0.35"/>
+  <ellipse cx="60" cy="58" rx="8" ry="14" fill="none" stroke="#063b27" stroke-width="1" opacity="0.35"/>
+  <!-- Shine -->
+  <path d="M44 42 C48 34 56 32 62 36" fill="none" stroke="#fff" stroke-width="2" opacity="0.45" stroke-linecap="round"/>
+</svg>

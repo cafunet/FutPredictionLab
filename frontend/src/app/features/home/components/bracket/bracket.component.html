@@ -1,0 +1,172 @@
+<div class="bracket-shell animate-fade-in-up">
+  <!-- Header -->
+  <div class="bracket-header">
+    <div>
+      <p class="bracket-kicker">Oráculo IA · Mundial 2026</p>
+      <h3 class="bracket-title">Fase Final Simulada</h3>
+      <p class="bracket-sub">
+        @if (isAuthenticated()) {
+          Top 8 FIFA · cuartos, semis y gran final predichos por DeepSeek
+        } @else {
+          Regístrate gratis para simular la fase final con IA
+        }
+      </p>
+    </div>
+    <button type="button" class="bracket-cta" (click)="predictChampion()" [disabled]="loading()">
+      @if (loading()) {
+        <span class="bracket-cta__spinner"></span>
+        Simulando…
+      } @else if (isAuthenticated()) {
+        ✨ Predecir campeón
+      } @else {
+        ✨ Regístrate para predecir
+      }
+    </button>
+  </div>
+
+  @if (error()) {
+    <p class="bracket-error">{{ error() }}</p>
+  }
+
+  @if (!bracket() && !loading()) {
+    <div class="bracket-empty">
+      <img [src]="trophyUrl" alt="Copa del Mundo FIFA" class="bracket-empty__trophy" />
+      <p>
+        @if (isAuthenticated()) {
+          Pulsa <strong>Predecir campeón</strong> para que la IA arme la llave completa desde cuartos de final.
+        } @else {
+          Crea una cuenta para desbloquear la simulación del campeón del Mundial.
+        }
+      </p>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="bracket-loading">
+      <img [src]="trophyUrl" alt="" class="bracket-loading__trophy" />
+      <p>Analizando cruces eliminatorios…</p>
+    </div>
+  }
+
+  @if (bracket(); as b) {
+    <div class="bracket-labels">
+      <span>Cuartos de Final</span>
+      <span>Semifinal</span>
+      <span class="bracket-labels__final">Gran Final</span>
+      <span>Semifinal</span>
+      <span>Cuartos de Final</span>
+    </div>
+
+    <div class="bracket-grid">
+      <!-- Izquierda: cuartos -->
+      <div class="bracket-col bracket-col--qf">
+        @for (m of b.quarterFinalsLeft; track m.home.name + m.away.name) {
+          <div class="bracket-match">
+            <ng-container *ngTemplateOutlet="teamRow; context: { team: m.home, match: m }" />
+            <ng-container *ngTemplateOutlet="teamRow; context: { team: m.away, match: m }" />
+          </div>
+        }
+        <div class="bracket-connector bracket-connector--qf-left"></div>
+      </div>
+
+      <!-- Izquierda: semi -->
+      <div class="bracket-col bracket-col--sf">
+        @if (b.semiFinalLeft; as sf) {
+          <div class="bracket-match bracket-match--semi">
+            <ng-container *ngTemplateOutlet="teamRow; context: { team: sf.home, match: sf }" />
+            <ng-container *ngTemplateOutlet="teamRow; context: { team: sf.away, match: sf }" />
+          </div>
+        }
+        <div class="bracket-connector bracket-connector--sf-left"></div>
+      </div>
+
+      <!-- Centro: final + campeón -->
+      <div class="bracket-col bracket-col--final">
+        <div class="bracket-trophy-wrap">
+          <img [src]="trophyUrl" alt="Copa del Mundo FIFA" class="bracket-trophy" />
+        </div>
+        @if (b.finalMatch; as fin) {
+          <div class="bracket-final-card">
+            <div class="bracket-final-card__meta">19 JUL 2026 · METLIFE STADIUM</div>
+            @if (hasScores(fin)) {
+              <div class="bracket-final-score">{{ fin.homeScore }} – {{ fin.awayScore }}</div>
+            }
+            <div class="bracket-final-teams">
+              <div class="bracket-final-team" [class.bracket-final-team--champ]="isChampion(fin.home, b.champion)">
+                <ng-container *ngTemplateOutlet="flag; context: { team: fin.home }" />
+                <span>{{ fin.home.name }}</span>
+                @if (isChampion(fin.home, b.champion)) {
+                  <span class="bracket-crown">👑</span>
+                }
+              </div>
+              <div class="bracket-final-vs">VS</div>
+              <div class="bracket-final-team" [class.bracket-final-team--champ]="isChampion(fin.away, b.champion)">
+                <ng-container *ngTemplateOutlet="flag; context: { team: fin.away }" />
+                <span>{{ fin.away.name }}</span>
+                @if (isChampion(fin.away, b.champion)) {
+                  <span class="bracket-crown">👑</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+        @if (b.champion) {
+          <div class="bracket-champion-banner">
+            <ng-container *ngTemplateOutlet="flag; context: { team: b.champion, large: true }" />
+            <div>
+              <span class="bracket-champion-label">Campeón del Mundial</span>
+              <span class="bracket-champion-name">{{ b.champion.name }}</span>
+            </div>
+          </div>
+        }
+        @if (b.reasoning) {
+          <p class="bracket-reasoning">{{ b.reasoning }}</p>
+        }
+      </div>
+
+      <!-- Derecha: semi -->
+      <div class="bracket-col bracket-col--sf">
+        @if (b.semiFinalRight; as sf) {
+          <div class="bracket-match bracket-match--semi">
+            <ng-container *ngTemplateOutlet="teamRow; context: { team: sf.home, match: sf }" />
+            <ng-container *ngTemplateOutlet="teamRow; context: { team: sf.away, match: sf }" />
+          </div>
+        }
+        <div class="bracket-connector bracket-connector--sf-right"></div>
+      </div>
+
+      <!-- Derecha: cuartos -->
+      <div class="bracket-col bracket-col--qf">
+        @for (m of b.quarterFinalsRight; track m.home.name + m.away.name) {
+          <div class="bracket-match">
+            <ng-container *ngTemplateOutlet="teamRow; context: { team: m.home, match: m }" />
+            <ng-container *ngTemplateOutlet="teamRow; context: { team: m.away, match: m }" />
+          </div>
+        }
+        <div class="bracket-connector bracket-connector--qf-right"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Templates -->
+  <ng-template #flag let-team="team" let-large="large">
+    @if (flagUrl(team)) {
+      <img [src]="flagUrl(team)" [alt]="team.name" class="bracket-flag" [class.bracket-flag--lg]="large" />
+    } @else {
+      <span class="bracket-flag-fallback" [class.bracket-flag-fallback--lg]="large">{{ team.name.slice(0, 2).toUpperCase() }}</span>
+    }
+  </ng-template>
+
+  <ng-template #teamRow let-team="team" let-match="match">
+    <div class="bracket-team-row" [class.bracket-team-row--winner]="isWinner(team, match)">
+      <ng-container *ngTemplateOutlet="flag; context: { team: team }" />
+      <span class="bracket-team-name">{{ team.name }}</span>
+      @if (teamScore(team, match) != null) {
+        <span class="bracket-score">{{ teamScore(team, match) }}</span>
+      }
+      @if (isWinner(team, match)) {
+        <span class="bracket-advance" title="Avanza">▶</span>
+      }
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,73 @@
+<div class="match-card"
+  [class.is-live]="match.status === 'EN_VIVO'"
+  [class.is-suspended]="match.status === 'SUSPENDIDO'"
+  [class.is-official]="match.status === 'OFICIAL'">
+
+  <!-- Header: Fecha + Estado -->
+  <div class="match-card__header">
+    <span class="match-card__date">📅 {{ getFormattedDate() }}</span>
+
+    @if (match.status === 'EN_VIVO') {
+      <span class="match-card__badge badge--live">
+        <span class="live-dot"></span> {{ liveBadge() }}
+      </span>
+    } @else if (match.status === 'SUSPENDIDO') {
+      <span class="match-card__badge badge--suspended">
+        ⏸ Suspendido@if (match.minute) { · {{ match.minute }}' }
+      </span>
+    } @else if (match.status === 'OFICIAL') {
+      <span class="match-card__badge badge--official">✔ Finalizado</span>
+    } @else {
+      <span class="match-card__badge badge--scheduled">🕐 {{ getMatchTime() }}</span>
+    }
+  </div>
+
+  <!-- Equipos -->
+  <div class="match-card__body">
+
+    <!-- Local -->
+    <div class="match-card__team" (click)="onTeamClick(match.local)">
+      @if (match.localBanderaUrl) {
+        <img class="match-card__flag-img" [src]="match.localBanderaUrl" [alt]="match.local" />
+      } @else {
+        <span class="match-card__flag-emoji">{{ match.localFlag }}</span>
+      }
+      <span class="match-card__name">{{ match.local }}</span>
+    </div>
+
+    <!-- Centro: Score o VS -->
+    <div class="match-card__center">
+      @if (match.status === 'EN_VIVO' || match.status === 'SUSPENDIDO' || match.status === 'OFICIAL') {
+        <div class="match-card__score"
+          [class.score--live]="match.status === 'EN_VIVO'"
+          [class.score--suspended]="match.status === 'SUSPENDIDO'">
+          <span>{{ match.localScore }}</span>
+          <span class="score-sep">–</span>
+          <span>{{ match.visitorScore }}</span>
+        </div>
+      } @else {
+        <div class="match-card__vs">vs</div>
+      }
+    </div>
+
+    <!-- Visitante -->
+    <div class="match-card__team" (click)="onTeamClick(match.visitor)">
+      @if (match.visitorBanderaUrl) {
+        <img class="match-card__flag-img" [src]="match.visitorBanderaUrl" [alt]="match.visitor" />
+      } @else {
+        <span class="match-card__flag-emoji">{{ match.visitorFlag }}</span>
+      }
+      <span class="match-card__name">{{ match.visitor }}</span>
+    </div>
+
+  </div>
+
+  <!-- Acciones -->
+  <div class="match-card__actions">
+    <button class="btn btn--secondary" (click)="onViewDetails()">📄 Detalles</button>
+    <button class="btn btn--primary" (click)="onRequestPrediction()">
+      <span class="bolt">⚡</span> Predicción IA
+    </button>
+  </div>
+
+</div>

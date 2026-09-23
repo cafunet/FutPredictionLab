@@ -1,0 +1,67 @@
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+  (click)="onBackdropClick($event)">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-fade-in-up">
+    <!-- Header -->
+    <div class="bg-emerald-600 p-6 relative overflow-hidden flex justify-between items-center text-white">
+      <h3 class="text-xl font-bold">{{ team ? 'Editar Equipo' : 'Añadir Equipo (Teams)' }}</h3>
+      <button (click)="close()" class="text-emerald-200 hover:text-white p-2 z-20">
+        <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6">
+      <p class="text-xs text-gray-500 mb-4">Nombre, país, grupo del torneo y posición en el ranking FIFA.</p>
+      @if (validationError()) {
+      <p class="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2" role="alert">
+        {{ validationError() }}
+      </p>
+      }
+      <div class="space-y-4">
+        <div>
+          <label for="teamName" class="block text-xs font-semibold text-gray-600 mb-1">Nombre del equipo</label>
+          <input #teamName id="teamName" type="text" [value]="team?.name || ''" autocomplete="off" placeholder="Ej. Brasil"
+            class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 outline-none transition-all">
+        </div>
+        <div>
+          <label for="teamPais" class="block text-xs font-semibold text-gray-600 mb-1">País</label>
+          <input #teamPais id="teamPais" type="text" [value]="team?.pais || ''" autocomplete="country-name" placeholder="Ej. Brasil"
+            class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 outline-none transition-all">
+        </div>
+        <div>
+          <label for="teamBandera" class="block text-xs font-semibold text-gray-600 mb-1">URL de la Bandera</label>
+          <input #teamBandera id="teamBandera" type="url" [value]="team?.banderaUrl || ''" placeholder="https://ejemplo.com/bandera.png"
+            class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 outline-none transition-all">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="teamGroup" class="block text-xs font-semibold text-gray-600 mb-1">Grupo</label>
+            <input #teamGroup id="teamGroup" type="text" [value]="team?.group || ''" maxlength="10" placeholder="Ej. A, B, C…"
+              class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 outline-none transition-all">
+          </div>
+          <div>
+            <label for="teamRank" class="block text-xs font-semibold text-gray-600 mb-1">Ranking FIFA</label>
+            <input #teamRank id="teamRank" type="number" [value]="team?.fifaRank || ''" min="0" max="999" step="1" inputmode="numeric"
+              placeholder="Ej. 5 (usa 0 si no aplica)"
+              class="w-full p-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 outline-none transition-all">
+          </div>
+        </div>
+        <p class="text-[11px] text-gray-400 mt-1">Ranking: entero según clasificación FIFA (0 permitido).</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 bg-gray-50 border-t flex justify-end gap-3">
+      <button (click)="close()"
+        class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-800 transition-colors">
+        Cancelar
+      </button>
+      <button (click)="save(teamName.value, teamPais.value, teamGroup.value, teamRank.value, teamBandera.value)"
+        class="px-6 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold shadow hover:bg-emerald-700 transition-colors">
+        {{ team ? 'Guardar Cambios' : 'Registrar Equipo' }}
+      </button>
+    </div>
+  </div>
+</div>

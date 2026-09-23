@@ -1,0 +1,95 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" (click)="onBackdropClick($event)">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+      <h3 class="text-lg font-bold text-[#063b27]">Detalle de predicción</h3>
+      <button (click)="close()" class="text-gray-400 hover:text-gray-600 p-1" aria-label="Cerrar">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-6 space-y-5">
+      <div>
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Partido</p>
+        <p class="font-bold text-gray-800">{{ item.match }}</p>
+        <p class="text-sm text-gray-500 mt-1">{{ getFormattedDate(item.date) }}</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-blue-50 rounded-lg p-3 text-center">
+          <p class="text-xs text-gray-500 mb-1">Tu predicción</p>
+          <p class="font-bold text-blue-800 text-sm">{{ item.predicted }}</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3 text-center">
+          <p class="text-xs text-gray-500 mb-1">Resultado real</p>
+          <p class="font-bold text-gray-800 text-sm">{{ item.result || 'Pendiente' }}</p>
+        </div>
+      </div>
+
+      @if (item.predictedLocalScore != null && item.predictedVisitorScore != null) {
+        <div class="bg-[#063b27] rounded-xl p-4 text-white text-center">
+          <p class="text-xs text-emerald-200 mb-2">Marcador previsto (IA)</p>
+          <div class="flex items-center justify-center gap-4">
+            <div>
+              <p class="text-xs opacity-75">{{ item.localTeam }}</p>
+              <p class="text-3xl font-black">{{ item.predictedLocalScore }}</p>
+            </div>
+            <span class="text-xl opacity-50">—</span>
+            <div>
+              <p class="text-xs opacity-75">{{ item.visitorTeam }}</p>
+              <p class="text-3xl font-black">{{ item.predictedVisitorScore }}</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (item.localWinProbability != null) {
+        <div>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Probabilidades</p>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span>Gana local</span>
+              <span class="font-bold">{{ item.localWinProbability }}%</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Empate</span>
+              <span class="font-bold">{{ item.drawProbability }}%</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Gana visitante</span>
+              <span class="font-bold">{{ item.visitorWinProbability }}%</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (item.justification) {
+        <div>
+          <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Justificación IA</p>
+          <p class="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg italic leading-relaxed">"{{ item.justification }}"</p>
+        </div>
+      }
+
+      <div class="flex flex-wrap gap-2 pt-2">
+        <span class="bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded">
+          Confianza: {{ item.accuracy }}%
+        </span>
+        @if (item.modelVersion) {
+          <span class="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded">
+            Modelo: {{ item.modelVersion }}
+          </span>
+        }
+        <span class="text-xs font-bold px-2.5 py-1 rounded"
+          [class.bg-emerald-100]="item.status === 'ACERTADA'"
+          [class.text-emerald-800]="item.status === 'ACERTADA'"
+          [class.bg-red-100]="item.status === 'FALLIDA'"
+          [class.text-red-800]="item.status === 'FALLIDA'"
+          [class.bg-gray-100]="item.status === 'PENDIENTE'"
+          [class.text-gray-700]="item.status === 'PENDIENTE'">
+          {{ item.status }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

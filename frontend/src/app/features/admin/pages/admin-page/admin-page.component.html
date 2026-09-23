@@ -1,0 +1,739 @@
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in-up">
+  <div class="mb-8 flex justify-between items-center border-b pb-4">
+    <div>
+      <h2 class="text-3xl font-extrabold text-[#063b27]">Panel de Administración</h2>
+      <p class="text-sm text-gray-500 mt-1">Hola, <b>{{ auth.displayName() }}</b>. Control de Base de Datos Maestra.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <!-- Acciones rápidas de partidos -->
+      <button type="button" (click)="openScheduleMatchModal()" class="quick-action-btn quick-action-schedule">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        Programar partido
+      </button>
+      <button type="button" (click)="openOfficializeMatchModal()" class="quick-action-btn quick-action-officialize">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Oficializar partido
+      </button>
+      <button type="button" (click)="loadUsers()"
+        class="text-sm px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+        [disabled]="loadingUsers()">
+        {{ loadingUsers() ? 'Actualizando…' : 'Refrescar lista' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Usuarios registrados -->
+  <section class="mb-10 bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-blue-100 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-lg text-[#063b27]">Usuarios registrados</h3>
+        <span class="text-sm text-gray-500">{{ users().length }} usuario(s)</span>
+      </div>
+      <button type="button" (click)="openCreateUserModal()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-blue-700 transition-colors">
+        Crear Usuario
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      @if (loadingUsers() && users().length === 0) {
+      <p class="p-8 text-center text-gray-500">Cargando usuarios…</p>
+      } @else if (users().length === 0) {
+      <p class="p-8 text-center text-gray-500">No hay usuarios para mostrar.</p>
+      } @else {
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Nombre</th>
+            <th class="px-4 py-3 font-semibold">Correo</th>
+            <th class="px-4 py-3 font-semibold">Rol</th>
+            <th class="px-4 py-3 font-semibold">Alta</th>
+            <th class="px-4 py-3 font-semibold">Modificado Por</th>
+            <th class="px-4 py-3 font-semibold">Fecha/hora</th>
+            <th class="px-4 py-3 font-semibold text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (user of users(); track user.id) {
+          <tr class="hover:bg-gray-50/80">
+            <td class="px-4 py-3 font-medium text-gray-900">{{ user.fullName }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ user.email }}</td>
+            <td class="px-4 py-3">
+              <select class="border rounded px-2 py-1.5 text-sm bg-white min-w-[120px]"
+                (change)="onRoleChange(user, $event)">
+                @for (r of roles; track r) {
+                <option [value]="r" [selected]="r === user.role">{{ r }}</option>
+                }
+              </select>
+            </td>
+            <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ user.createdAt | date: 'short' }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ user.modifiedBy || '-' }}</td>
+            <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ user.modifiedAt ? (user.modifiedAt | date: 'short')
+              : '-' }}</td>
+            <td class="px-4 py-3 text-right space-x-2">
+              <button type="button" (click)="setEditingUser(user)"
+                class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                Editar
+              </button>
+              <button type="button" (click)="removeUser(user)" [disabled]="isCurrentUser(user)"
+                [title]="isCurrentUser(user) ? 'No puedes eliminar tu propia cuenta' : 'Eliminar usuario'"
+                class="text-red-600 hover:text-red-800 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+    </div>
+  </section>
+
+  <!-- Equipos registrados -->
+  <section class="mb-10 bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-emerald-100 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-lg text-[#063b27]">Equipos registrados</h3>
+        <span class="text-sm text-gray-500">{{ teams().length }} equipo(s)</span>
+      </div>
+      <button type="button" (click)="openCreateTeamModal()"
+        class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-emerald-700 transition-colors">
+        Añadir Equipo
+      </button>
+    </div>
+    <div class="overflow-x-auto max-h-96">
+      @if (teams().length === 0) {
+      <p class="p-8 text-center text-gray-500">No hay equipos para mostrar.</p>
+      } @else {
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Bandera</th>
+            <th class="px-4 py-3 font-semibold">Nombre</th>
+            <th class="px-4 py-3 font-semibold">País</th>
+            <th class="px-4 py-3 font-semibold">Grupo</th>
+            <th class="px-4 py-3 font-semibold">Ranking</th>
+            <th class="px-4 py-3 font-semibold text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (team of teams(); track team.id) {
+          <tr class="hover:bg-gray-50/80">
+            <td class="px-4 py-3">
+              @if (team.banderaUrl) {
+              <img [src]="team.banderaUrl" alt="Bandera" class="w-8 h-6 object-cover rounded shadow-sm">
+              } @else {
+              <div
+                class="w-8 h-6 bg-gray-200 rounded text-center text-[10px] flex items-center justify-center text-gray-500">
+                N/A</div>
+              }
+            </td>
+            <td class="px-4 py-3 font-medium text-gray-900">{{ team.name }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ team.pais }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ team.group }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ team.fifaRank }}</td>
+            <td class="px-4 py-3 text-right space-x-2">
+              <button type="button" (click)="setEditingTeam(team)"
+                class="text-emerald-600 hover:text-emerald-800 text-sm font-semibold">
+                Editar
+              </button>
+              <button type="button" (click)="removeTeam(team)"
+                class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+    </div>
+  </section>
+
+  <!-- Partidos programados -->
+  <section class="mb-10 bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-amber-100 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-lg text-[#063b27]">Partidos programados</h3>
+        <span class="text-sm text-gray-500">{{ matches().length }} partido(s) · En vivo automático a la hora programada (Colombia)</span>
+      </div>
+    </div>
+    <div class="overflow-x-auto max-h-96">
+      @if (matches().length === 0) {
+      <p class="p-8 text-center text-gray-500">No hay partidos registrados.</p>
+      } @else {
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Local</th>
+            <th class="px-4 py-3 font-semibold">Visitante</th>
+            <th class="px-4 py-3 font-semibold">Fecha y hora programada</th>
+            <th class="px-4 py-3 font-semibold">Estadio</th>
+            <th class="px-4 py-3 font-semibold">Fase</th>
+            <th class="px-4 py-3 font-semibold">Estado</th>
+            <th class="px-4 py-3 font-semibold">Marcador</th>
+            <th class="px-4 py-3 font-semibold">Programado por</th>
+            <th class="px-4 py-3 font-semibold text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (match of sortedMatches(); track match.id) {
+          <tr class="hover:bg-gray-50/80">
+            <td class="px-4 py-3 font-medium text-gray-900">{{ match.local }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ match.visitor }}</td>
+            <td class="px-4 py-3 text-gray-800 whitespace-nowrap font-medium">{{ formatMatchDateTime(match.date) }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ match.estadio || '—' }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ match.fase || '—' }}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex px-2 py-0.5 rounded text-xs font-bold"
+                [class.bg-green-100]="match.status === 'OFICIAL'"
+                [class.text-green-800]="match.status === 'OFICIAL'"
+                [class.bg-red-100]="match.status === 'EN_VIVO'"
+                [class.text-red-700]="match.status === 'EN_VIVO'"
+                [class.bg-amber-100]="match.status === 'SUSPENDIDO'"
+                [class.text-amber-800]="match.status === 'SUSPENDIDO'"
+                [class.bg-gray-100]="match.status === 'PROGRAMADO'"
+                [class.text-gray-700]="match.status === 'PROGRAMADO'">
+                {{ matchStatusLabel(match.status) }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-gray-700 font-mono">{{ match.localScore }} - {{ match.visitorScore }}</td>
+            <td class="px-4 py-3 text-gray-600 text-xs">{{ match.scheduledBy || '—' }}</td>
+            <td class="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+              @if (match.status === 'PROGRAMADO') {
+              <button type="button" (click)="startLiveNow(match)"
+                class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Iniciar ya
+              </button>
+              <button type="button" (click)="suspendMatchNow(match)"
+                class="text-amber-700 hover:text-amber-900 text-sm font-semibold">
+                Suspendido
+              </button>
+              <button type="button" (click)="openEditMatchModal(match)"
+                class="text-amber-700 hover:text-amber-900 text-sm font-semibold">
+                Editar
+              </button>
+              <button type="button" (click)="removeMatch(match)"
+                class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Eliminar
+              </button>
+              } @else if (match.status === 'EN_VIVO') {
+              <button type="button" (click)="openLiveSimulation(match)"
+                class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Simular
+              </button>
+              <button type="button" (click)="suspendMatchNow(match)"
+                class="text-amber-700 hover:text-amber-900 text-sm font-semibold">
+                Suspender
+              </button>
+              <button type="button" (click)="openOfficializeMatchModal(match)"
+                class="text-emerald-700 hover:text-emerald-900 text-sm font-semibold">
+                Oficializar
+              </button>
+              <button type="button" (click)="removeMatch(match)"
+                class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Eliminar
+              </button>
+              } @else if (match.status === 'SUSPENDIDO') {
+              <button type="button" (click)="resumeMatchNow(match)"
+                class="text-emerald-700 hover:text-emerald-900 text-sm font-semibold">
+                Reanudar
+              </button>
+              <button type="button" (click)="removeMatch(match)"
+                class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Eliminar
+              </button>
+              } @else {
+              <span class="text-xs text-gray-400">—</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+    </div>
+  </section>
+
+  <!-- Tabla de posiciones (edición manual) -->
+  <section class="mb-10 bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-indigo-50 flex flex-wrap justify-between items-center gap-3">
+      <div>
+        <h3 class="font-bold text-lg text-[#063b27]">Tablas de posiciones</h3>
+        <span class="text-sm text-gray-500">Los partidos se sincronizan cada 5 s; esta tabla solo con Refrescar</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-semibold text-gray-600">Grupo</label>
+        <select [(ngModel)]="standingsGroup" (ngModelChange)="onStandingsGroupChange()" class="border rounded px-2 py-1 text-sm">
+          @for (g of adminGroups(); track g) {
+          <option [value]="g">{{ g }}</option>
+          }
+        </select>
+        <button type="button" (click)="loadGroupStandings()" class="text-sm px-3 py-1 rounded border border-gray-300 hover:bg-gray-50">Refrescar</button>
+        @if (standingsDirty()) {
+          <span class="text-xs text-amber-700 font-semibold">Hay cambios sin guardar</span>
+        }
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      @if (groupStandingsRows().length === 0) {
+      <p class="p-8 text-center text-gray-500">No hay equipos en este grupo o aún no hay datos.</p>
+      } @else {
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+          <tr>
+            <th class="px-3 py-2 text-left">Equipo</th>
+            <th class="px-2 py-2">PTS</th>
+            <th class="px-2 py-2">PJ</th>
+            <th class="px-2 py-2">PG</th>
+            <th class="px-2 py-2">PE</th>
+            <th class="px-2 py-2">PP</th>
+            <th class="px-2 py-2">GF</th>
+            <th class="px-2 py-2">GC</th>
+            <th class="px-2 py-2">DG</th>
+            <th class="px-3 py-2">Modificado por</th>
+            <th class="px-3 py-2">Fecha/hora</th>
+            <th class="px-3 py-2 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (row of groupStandingsRows(); track row.teamId) {
+          <tr [class.bg-amber-50]="row.manualOverride" [class.bg-red-50/40]="row.provisional && !row.manualOverride">
+            <td class="px-3 py-2 font-medium">
+              {{ row.name }}
+              @if (row.provisional) { <span class="text-[10px] text-red-600 font-bold">LIVE</span> }
+              @if (row.manualOverride) { <span class="text-[10px] text-amber-700">MANUAL</span> }
+            </td>
+            <td class="px-1 py-1"><input type="number" min="0" [(ngModel)]="row.pts" (ngModelChange)="markStandingsDirty()" class="w-14 border rounded px-1 py-1 text-center text-xs"></td>
+            <td class="px-1 py-1"><input type="number" min="0" [(ngModel)]="row.pj" (ngModelChange)="markStandingsDirty()" class="w-14 border rounded px-1 py-1 text-center text-xs"></td>
+            <td class="px-1 py-1"><input type="number" min="0" [(ngModel)]="row.pg" (ngModelChange)="markStandingsDirty()" class="w-14 border rounded px-1 py-1 text-center text-xs"></td>
+            <td class="px-1 py-1"><input type="number" min="0" [(ngModel)]="row.pe" (ngModelChange)="markStandingsDirty()" class="w-14 border rounded px-1 py-1 text-center text-xs"></td>
+            <td class="px-1 py-1"><input type="number" min="0" [(ngModel)]="row.pp" (ngModelChange)="markStandingsDirty()" class="w-14 border rounded px-1 py-1 text-center text-xs"></td>
+            <td class="px-1 py-1"><input type="number" min="0" [(ngModel)]="row.gf" (ngModelChange)="markStandingsDirty()" class="w-14 border rounded px-1 py-1 text-center text-xs"></td>
+            <td class="px-1 py-1"><input type="number" min="0" [(ngModel)]="row.gc" (ngModelChange)="markStandingsDirty()" class="w-14 border rounded px-1 py-1 text-center text-xs"></td>
+            <td class="px-2 py-2 text-center font-mono text-gray-600">{{ (row.gf ?? 0) - (row.gc ?? 0) }}</td>
+            <td class="px-3 py-2 text-gray-600 text-xs whitespace-nowrap">{{ row.modifiedBy || '—' }}</td>
+            <td class="px-3 py-2 text-gray-500 text-xs whitespace-nowrap">{{ row.modifiedAt ? (row.modifiedAt | date: 'short') : '—' }}</td>
+            <td class="px-3 py-2 text-right whitespace-nowrap">
+              @if (standingRowHasChanges(row)) {
+              <button type="button" (click)="saveStandingRow(row)" [disabled]="savingStanding()"
+                class="text-indigo-700 hover:text-indigo-900 text-xs font-bold">Guardar</button>
+              } @else {
+              <span class="text-xs text-gray-300">—</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+    </div>
+  </section>
+
+  <!-- Simulación en vivo -->
+  <section id="live-simulation" class="mb-10 bg-white rounded-xl shadow-md border border-red-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-red-100 bg-red-100 flex justify-between items-center flex-wrap gap-2">
+      <div>
+        <h3 class="font-bold text-lg text-[#063b27]">Simulación en vivo</h3>
+        <span class="text-sm text-gray-600">Marcador y eventos (⚽ gol, 🟨 amarilla, 🟥 roja) — se reflejan en la home</span>
+      </div>
+      <span class="text-xs font-bold text-red-700 bg-red-100 px-2 py-1 rounded">{{ liveMatches().length }} en vivo</span>
+    </div>
+
+    @if (liveMatches().length === 0) {
+    <p class="p-8 text-center text-gray-500">No hay partidos en vivo. Programa uno o usa <strong>Iniciar ya</strong>.</p>
+    } @else {
+    <div class="p-6 grid lg:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <div class="match-field">
+          <label class="match-label">Partido en vivo</label>
+          <select [(ngModel)]="simulationMatchId" (ngModelChange)="onSimulationMatchChange()" class="match-select">
+            @for (m of liveMatches(); track m.id) {
+            <option [value]="m.id">{{ m.local }} vs {{ m.visitor }} ({{ m.localScore }} - {{ m.visitorScore }})</option>
+            }
+          </select>
+        </div>
+
+        @if (selectedSimulationMatch(); as sim) {
+        <div class="sim-score-box">
+          <div class="text-center text-sm font-bold text-gray-700 mb-3">{{ sim.local }} vs {{ sim.visitor }}</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="match-field">
+              <label class="match-label">Goles {{ sim.local }}</label>
+              <input [(ngModel)]="simulationLocalScore" type="number" min="0" max="50" class="match-input">
+            </div>
+            <div class="match-field">
+              <label class="match-label">Goles {{ sim.visitor }}</label>
+              <input [(ngModel)]="simulationVisitorScore" type="number" min="0" max="50" class="match-input">
+            </div>
+          </div>
+          <button type="button" (click)="saveSimulationScore()" class="mt-3 w-full match-confirm-btn schedule-confirm"
+            [disabled]="savingLiveScore()">
+            {{ savingLiveScore() ? 'Guardando…' : 'Guardar marcador' }}
+          </button>
+        </div>
+
+        <div class="sim-clock-box border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3">
+          <div class="flex justify-between items-center gap-2 flex-wrap">
+            <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wide">Reloj del partido</h4>
+            <span class="text-xs font-bold px-2 py-1 rounded-full"
+              [class.bg-amber-100]="sim.halftimeBreak"
+              [class.text-amber-800]="sim.halftimeBreak"
+              [class.bg-red-100]="!sim.halftimeBreak"
+              [class.text-red-700]="!sim.halftimeBreak">
+              {{ simulationLiveLabel(sim) }}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="match-field">
+              <label class="match-label">Tiempo de juego</label>
+              <input [(ngModel)]="simulationMinute" type="number" min="0" max="120" class="match-input" placeholder="43">
+            </div>
+            <div class="match-field">
+              <label class="match-label">Tiempo adición (+)</label>
+              <input [(ngModel)]="simulationStoppage" type="number" min="0" max="30" class="match-input" placeholder="5">
+            </div>
+          </div>
+          <p class="text-xs text-gray-500">En la home se verá como <strong>{{ simulationClockShort(sim) }}</strong> (ej. 43' +5).</p>
+          <button type="button" (click)="saveSimulationClock()" class="w-full match-confirm-btn schedule-confirm"
+            [disabled]="savingLiveClock() || sim.halftimeBreak">
+            {{ savingLiveClock() ? 'Guardando…' : 'Guardar reloj' }}
+          </button>
+          <div class="flex flex-wrap gap-2 pt-1">
+            @if (!sim.halftimeBreak) {
+            <button type="button" (click)="startHalftimeSimulation()"
+              class="flex-1 min-w-[8rem] text-sm px-3 py-2 rounded-lg border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100 font-semibold">
+              Descanso
+            </button>
+            } @else {
+            <button type="button" (click)="resumeHalftimeSimulation()"
+              class="flex-1 min-w-[8rem] text-sm px-3 py-2 rounded-lg border border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-semibold">
+              Reanudar 2.º tiempo
+            </button>
+            }
+          </div>
+        </div>
+
+        <button type="button" (click)="officializeSimulationMatch()"
+          class="w-full match-confirm-btn officialize-confirm"
+          [disabled]="officializingSimulation()">
+          {{ officializingSimulation() ? 'Oficializando…' : 'Oficializar partido' }}
+        </button>
+        }
+      </div>
+
+      <div class="space-y-4">
+        <h4 class="font-bold text-gray-800 text-sm uppercase tracking-wide">Registrar evento</h4>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="match-field">
+            <label class="match-label">Tipo</label>
+            <select [(ngModel)]="eventForm.type" class="match-select">
+              <option value="goal">⚽ Gol</option>
+              <option value="yellow">🟨 Tarjeta amarilla</option>
+              <option value="red">🟥 Tarjeta roja</option>
+            </select>
+          </div>
+          <div class="match-field">
+            <label class="match-label">Minuto</label>
+            <input [(ngModel)]="eventForm.minute" type="number" min="0" max="120" class="match-input">
+          </div>
+          <div class="match-field">
+            <label class="match-label">Equipo</label>
+            <select [(ngModel)]="eventForm.teamSide" class="match-select">
+              @if (selectedSimulationMatch(); as sim) {
+              <option value="local">{{ sim.local }}</option>
+              <option value="visitor">{{ sim.visitor }}</option>
+              }
+            </select>
+          </div>
+          <div class="match-field">
+            <label class="match-label">Jugador @if (loadingPlayers()) { (cargando…) }</label>
+            <select [(ngModel)]="eventForm.playerName" class="match-select">
+              <option value="">— Jugador —</option>
+              @for (p of eventPlayerOptions; track p) {
+              <option [value]="p">{{ p }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500">Jugadores desde caché API-Football. Abre la plantilla del equipo en Inicio si la lista está vacía.</p>
+        <button type="button" (click)="addSimulationEvent()" class="w-full match-confirm-btn officialize-confirm"
+          [disabled]="addingEvent()">
+          {{ addingEvent() ? 'Registrando…' : 'Agregar evento' }}
+        </button>
+
+        @if (selectedSimulationMatch()?.events?.length) {
+        <div class="sim-events-list">
+          <h4 class="font-bold text-gray-800 text-sm mb-2">Eventos registrados</h4>
+          @for (ev of selectedSimulationMatch()!.events!; track ev.id ?? ev.minute + ev.text) {
+          <div class="sim-event-row">
+            <span class="font-mono text-xs text-red-700">{{ ev.minute }}'</span>
+            <span>{{ eventTypeIcon(ev.type) }}</span>
+            <span class="flex-1 text-sm text-gray-800 truncate">{{ ev.text }}</span>
+            @if (ev.id) {
+            <button type="button" (click)="removeSimulationEvent(ev.id)" class="text-xs text-red-600 hover:underline">Quitar</button>
+            }
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </section>
+
+  <!-- Predicciones de usuarios (PostgreSQL) -->
+  <section class="mb-10 bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 bg-violet-200 flex justify-between items-center">
+      <div>
+        <h3 class="font-bold text-lg text-[#063b27]">Predicciones de usuarios</h3>
+        <span class="text-sm text-gray-500">{{ userPredictions().length }} guardada(s) en la base principal</span>
+      </div>
+      <button type="button" (click)="loadUserPredictions()" class="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow hover:bg-violet-700 transition-colors"
+        [disabled]="loadingPredictions()">
+        {{ loadingPredictions() ? 'Actualizando…' : 'Refrescar' }}
+      </button>
+    </div>
+    <div class="overflow-x-auto max-h-96">
+      @if (loadingPredictions() && userPredictions().length === 0) {
+      <p class="p-8 text-center text-gray-500">Cargando predicciones…</p>
+      } @else if (userPredictions().length === 0) {
+      <p class="p-8 text-center text-gray-500">Aún no hay predicciones guardadas por los usuarios.</p>
+      } @else {
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Usuario</th>
+            <th class="px-4 py-3 font-semibold">Partido</th>
+            <th class="px-4 py-3 font-semibold">Predicción</th>
+            <th class="px-4 py-3 font-semibold">Resultado real</th>
+            <th class="px-4 py-3 font-semibold">Estado</th>
+            <th class="px-4 py-3 font-semibold">Confianza</th>
+            <th class="px-4 py-3 font-semibold">Fecha</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (p of userPredictions(); track p.id) {
+          <tr class="hover:bg-gray-50/80">
+            <td class="px-4 py-3">
+              <div class="font-medium text-gray-900">{{ p.userName }}</div>
+              <div class="text-xs text-gray-500">{{ p.userEmail }}</div>
+            </td>
+            <td class="px-4 py-3 text-gray-700">{{ p.match }}</td>
+            <td class="px-4 py-3 font-medium text-gray-900">{{ p.predicted }}</td>
+            <td class="px-4 py-3 text-gray-700 font-mono">{{ p.result }}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex px-2 py-0.5 rounded text-xs font-bold"
+                [class.bg-green-100]="p.status === 'ACERTADA'"
+                [class.text-green-800]="p.status === 'ACERTADA'"
+                [class.bg-red-100]="p.status === 'FALLIDA'"
+                [class.text-red-700]="p.status === 'FALLIDA'"
+                [class.bg-gray-100]="p.status === 'PENDIENTE'"
+                [class.text-gray-700]="p.status === 'PENDIENTE'">
+                {{ predictionStatusLabel(p.status) }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-gray-700">{{ p.confidence }}%</td>
+            <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ formatMatchDateTime(p.date) }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+    </div>
+  </section>
+
+
+</main>
+
+<!-- Modales -->
+@if (editingUser() || isCreatingUser()) {
+<app-user-form-modal [user]="editingUser()" (closed)="closeUserModal()" (saved)="handleUserSave($event)">
+</app-user-form-modal>
+}
+
+@if (editingTeam() || isCreatingTeam()) {
+<app-team-form-modal [team]="editingTeam()" (closed)="closeTeamModal()" (saved)="handleTeamSave($event)">
+</app-team-form-modal>
+}
+
+<!-- Modal: Programar partido -->
+@if (isSchedulingMatch()) {
+<div class="match-modal-backdrop" (click)="closeScheduleMatchModal()">
+  <div class="match-modal-panel" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="match-modal-header schedule-header">
+      <div class="flex items-center gap-3">
+        <div class="match-modal-icon schedule-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="match-modal-title">{{ editingMatch() ? 'Editar partido' : 'Programar partido' }}</h3>
+          <p class="match-modal-subtitle">La fecha y hora deben ser <strong>posteriores a ahora</strong>.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="loadTeams()" class="modal-reload-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Recargar equipos
+        </button>
+        <button type="button" (click)="closeScheduleMatchModal()" class="match-modal-close">✕</button>
+      </div>
+    </div>
+    @if (scheduleFormError()) {
+    <div class="match-form-error match-form-error--banner" role="alert">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ scheduleFormError() }}</span>
+    </div>
+    }
+    <!-- Body -->
+    <div class="match-modal-body">
+      <div class="match-form-grid">
+        <div class="match-field">
+          <label class="match-label">Equipo local</label>
+          <select [(ngModel)]="scheduleForm.idLocal" class="match-select">
+            <option value="">— Selecciona —</option>
+            @for (t of teams(); track t.id) {
+            <option [value]="t.id">{{ t.name }} (Grupo {{ t.group }})</option>
+            }
+          </select>
+        </div>
+        <div class="match-field">
+          <label class="match-label">Estadio</label>
+          <input [(ngModel)]="scheduleForm.estadio" type="text" placeholder="Ej. Estadio Azteca" maxlength="120" class="match-input">
+        </div>
+        <div class="match-field">
+          <label class="match-label">Equipo visitante</label>
+          <select [(ngModel)]="scheduleForm.idVisitor" class="match-select">
+            <option value="">— Selecciona —</option>
+            @for (t of teams(); track t.id) {
+            <option [value]="t.id">{{ t.name }} (Grupo {{ t.group }})</option>
+            }
+          </select>
+        </div>
+        <div class="match-field">
+          <label class="match-label">Fase</label>
+          <input [(ngModel)]="scheduleForm.fase" type="text" placeholder="Ej. Fase de grupos" maxlength="50" class="match-input">
+        </div>
+        <div class="match-field col-span-full">
+          <label class="match-label">Fecha y hora</label>
+          <input [(ngModel)]="scheduleForm.fechaHora" type="datetime-local" class="match-input"
+            (ngModelChange)="scheduleFormError.set(null)">
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="match-modal-footer">
+      <button type="button" (click)="closeScheduleMatchModal()" class="match-cancel-btn" [disabled]="savingMatch()">Cancelar</button>
+      <button type="button" (click)="submitScheduleForm()" class="match-confirm-btn schedule-confirm" [disabled]="savingMatch()">
+        @if (savingMatch()) {
+        Guardando…
+        } @else {
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        {{ editingMatch() ? 'Guardar cambios' : 'Crear partido' }}
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Modal: Oficializar partido -->
+@if (isOfficializingMatch()) {
+<div class="match-modal-backdrop" (click)="closeOfficializeMatchModal()">
+  <div class="match-modal-panel" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="match-modal-header officialize-header">
+      <div class="flex items-center gap-3">
+        <div class="match-modal-icon officialize-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="match-modal-title">Oficializar Partido</h3>
+          <p class="match-modal-subtitle">Solo administradores. Acción irreversible.</p>
+        </div>
+      </div>
+      <button type="button" (click)="closeOfficializeMatchModal()" class="match-modal-close">✕</button>
+    </div>
+    <!-- Body -->
+    <div class="match-modal-body">
+      <p class="text-sm text-gray-600 mb-4">Cierra el partido en vivo y deja el resultado como oficial (irreversible).</p>
+      <div class="match-field mb-4">
+        <label class="match-label">Partido en vivo</label>
+        <select [(ngModel)]="officializeForm.matchId" class="match-select">
+          <option value="">— Selecciona —</option>
+          @for (m of matchesToOfficialize(); track m.id) {
+          <option [value]="m.id">{{ m.local }} vs {{ m.visitor }} ({{ m.localScore }} - {{ m.visitorScore }})</option>
+          }
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="match-field">
+          <label class="match-label">Goles local</label>
+          <input [(ngModel)]="officializeForm.localScore" type="number" min="0" max="50" class="match-input">
+        </div>
+        <div class="match-field">
+          <label class="match-label">Goles visitante</label>
+          <input [(ngModel)]="officializeForm.visitorScore" type="number" min="0" max="50" class="match-input">
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="match-modal-footer">
+      <button type="button" (click)="closeOfficializeMatchModal()" class="match-cancel-btn">Cancelar</button>
+      <button type="button" (click)="officializeMatch()" class="match-confirm-btn officialize-confirm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Oficializar
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+@if (confirmDialog(); as dlg) {
+<app-confirm-dialog
+  [data]="dlg"
+  (confirmed)="onConfirmDialogAccepted()"
+  (cancelled)="onConfirmDialogCancelled()" />
+}
+
+@if (toast() && !isSchedulingMatch() && !isOfficializingMatch() && !confirmDialog()) {
+<div class="admin-toast" [class.admin-toast--error]="toast()!.type === 'error'" role="status" aria-live="polite">
+  @if (toast()!.type === 'success') {
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+  } @else {
+  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+  }
+  <span>{{ toast()!.message }}</span>
+  <button type="button" class="admin-toast__close" (click)="toast.set(null)" aria-label="Cerrar aviso">✕</button>
+</div>
+}

@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: backend-proyecto-db
+    environment:
+      POSTGRES_DB: predicciones_db
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD en .env}
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d predicciones_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend-proyecto-app
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    environment:
+      SERVER_PORT: 8081
+      JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET en .env}
+      JWT_EXPIRATION_MS: 3600000
+      PREDICTION_LLM_BASE_URL: http://host.docker.internal:8080
+      PREDICTION_LLM_ENABLED: "false"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres_data:

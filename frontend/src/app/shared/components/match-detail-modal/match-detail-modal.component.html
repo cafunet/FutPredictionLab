@@ -1,0 +1,89 @@
+<div class="modal-backdrop" (click)="close()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-header__title">
+        <svg class="modal-header__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Detalles del Partido
+      </div>
+      <button class="modal-header__close" (click)="close()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <!-- Equipos VS con banderas reales -->
+      <div class="teams-row">
+        <div class="team-block" >
+          @if (match.localBanderaUrl) {
+            <img class="team-block__flag-img" [src]="match.localBanderaUrl" [alt]="match.local" />
+          } @else {
+            <span class="team-block__flag-emoji">{{ match.localFlag }}</span>
+          }
+          <span class="team-block__name">{{ match.local }}</span>
+        </div>
+
+        <div class="teams-row__center">
+          @if (match.status === 'EN_VIVO' || match.status === 'OFICIAL') {
+            <div class="score-box" [class.score-box--live]="match.status === 'EN_VIVO'">
+              <span>{{ match.localScore }}</span>
+              <span class="score-box__sep">–</span>
+              <span>{{ match.visitorScore }}</span>
+            </div>
+            @if (match.status === 'EN_VIVO') {
+              <span class="live-badge"><span class="live-dot"></span> EN VIVO · {{ match.minute }}'</span>
+            } @else {
+              <span class="official-badge">✔ Finalizado</span>
+            }
+          } @else {
+            <div class="vs-text">vs</div>
+          }
+        </div>
+
+        <div class="team-block">
+          @if (match.visitorBanderaUrl) {
+            <img class="team-block__flag-img" [src]="match.visitorBanderaUrl" [alt]="match.visitor" />
+          } @else {
+            <span class="team-block__flag-emoji">{{ match.visitorFlag }}</span>
+          }
+          <span class="team-block__name">{{ match.visitor }}</span>
+        </div>
+      </div>
+
+      <!-- Info Grid: datos reales de la BD -->
+      <div class="info-grid">
+
+        <div class="info-card">
+          <span class="info-card__label">🏟️ Estadio</span>
+          <span class="info-card__value">{{ match.estadio || 'Por Definir' }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-card__label">🏆 Fase</span>
+          <span class="info-card__value">{{ match.fase || 'Por Definir' }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-card__label">📅 Fecha</span>
+          <span class="info-card__value">{{ getFormattedDate() }}</span>
+        </div>
+
+        <div class="info-card">
+          <span class="info-card__label">🕐 Hora</span>
+          <span class="info-card__value info-card__value--highlight">{{ getMatchTime() }} UTC</span>
+        </div>
+
+      </div>
+
+      <!-- CTA Predicción -->
+      <button class="cta-btn" (click)="onRequestPrediction()">
+        <span class="cta-btn__bolt">⚡</span> Solicitar Predicción IA
+      </button>
+
+    </div>
+  </div>
+</div>

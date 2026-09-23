@@ -1,0 +1,25 @@
+# Editores y sistema
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.antigravitycli/
+*.swp
+*.swo
+
+# Secretos locales; las plantillas no contienen credenciales
+.env
+.env.*
+!.env.example
+*.pem
+*.pfx
+
+# Archivos regenerables
+node_modules/
+target/
+dist/
+.angular/
+coverage/
+.artifacts/
+*.log
+errores-backend*.txt

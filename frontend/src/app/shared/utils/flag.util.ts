@@ -1,0 +1,80 @@
+const COUNTRY_CODES: Record<string, string> = {
+  argentina: 'ar',
+  brasil: 'br',
+  brazil: 'br',
+  francia: 'fr',
+  france: 'fr',
+  inglaterra: 'gb-eng',
+  england: 'gb-eng',
+  españa: 'es',
+  espana: 'es',
+  spain: 'es',
+  portugal: 'pt',
+  holanda: 'nl',
+  netherlands: 'nl',
+  belgica: 'be',
+  belgium: 'be',
+  alemania: 'de',
+  germany: 'de',
+  italia: 'it',
+  italy: 'it',
+  colombia: 'co',
+  mexico: 'mx',
+  'estados unidos': 'us',
+  usa: 'us',
+  uruguay: 'uy',
+  chile: 'cl',
+  ecuador: 'ec',
+  peru: 'pe',
+  paraguay: 'py',
+  venezuela: 've',
+  croacia: 'hr',
+  croatia: 'hr',
+  marruecos: 'ma',
+  morocco: 'ma',
+  japon: 'jp',
+  japan: 'jp',
+  'corea del sur': 'kr',
+  'south korea': 'kr',
+  canada: 'ca',
+  suiza: 'ch',
+  switzerland: 'ch',
+  polonia: 'pl',
+  poland: 'pl',
+  dinamarca: 'dk',
+  denmark: 'dk',
+  suecia: 'se',
+  sweden: 'se',
+  austria: 'at',
+  serbia: 'rs',
+  ucrania: 'ua',
+  ukraine: 'ua',
+  turquia: 'tr',
+  turkey: 'tr',
+  senegal: 'sn',
+  ghana: 'gh',
+  nigeria: 'ng',
+  camerun: 'cm',
+  cameroon: 'cm',
+  australia: 'au',
+  qatar: 'qa',
+  'arabia saudita': 'sa',
+  'saudi arabia': 'sa',
+  iran: 'ir',
+  'costa rica': 'cr',
+  panama: 'pa',
+  wales: 'gb-wls',
+  gales: 'gb-wls'
+};
+
+function normalize(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+export function resolveFlagUrl(banderaUrl: string | undefined | null, pais: string, name: string): string {
+  if (banderaUrl?.trim()) {
+    return banderaUrl.trim();
+  }
+  const code = COUNTRY_CODES[normalize(pais)] ?? COUNTRY_CODES[normalize(name)];
+  return code ? `https://flagcdn.com/w80/${code}.png` : '';
+}

@@ -1,0 +1,443 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes trophyGlow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(204, 255, 0, 0.35)); }
+  50% { filter: drop-shadow(0 0 18px rgba(204, 255, 0, 0.65)); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.45s ease-out forwards;
+}
+
+.bracket-shell {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 1.75rem 1.5rem 2rem;
+  overflow-x: auto;
+}
+
+.bracket-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.bracket-kicker {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #059669;
+  margin: 0 0 0.25rem;
+}
+
+.bracket-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #063b27;
+  margin: 0;
+}
+
+.bracket-sub {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0.35rem 0 0;
+}
+
+.bracket-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #063b27, #0a5c3e);
+  color: #ccff00;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(6, 59, 39, 0.25);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.bracket-cta:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(6, 59, 39, 0.35);
+}
+
+.bracket-cta:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.bracket-cta__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(204, 255, 0, 0.3);
+  border-top-color: #ccff00;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.bracket-error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border-radius: 0.5rem;
+}
+
+.bracket-empty,
+.bracket-loading {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.bracket-empty__trophy,
+.bracket-loading__trophy {
+  width: 5rem;
+  height: auto;
+  margin: 0 auto 1rem;
+  opacity: 0.85;
+  animation: trophyGlow 2.5s ease-in-out infinite;
+}
+
+.bracket-labels {
+  display: flex;
+  justify-content: space-between;
+  min-width: 720px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  padding: 0 0.5rem 0.75rem;
+}
+
+.bracket-labels__final {
+  color: #063b27;
+  font-size: 0.85rem;
+}
+
+.bracket-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  min-width: 720px;
+  min-height: 380px;
+  gap: 0.5rem;
+}
+
+.bracket-col {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.bracket-col--qf {
+  width: 11rem;
+  justify-content: space-around;
+}
+
+.bracket-col--sf {
+  width: 11rem;
+  justify-content: center;
+  margin: 0 0.5rem;
+}
+
+.bracket-col--final {
+  width: 14rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.75rem;
+  text-align: center;
+}
+
+.bracket-match {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  position: relative;
+  z-index: 2;
+}
+
+.bracket-match--semi {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  box-shadow: 0 2px 8px rgba(6, 59, 39, 0.08);
+}
+
+.bracket-team-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.55rem;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.bracket-team-row:last-child {
+  border-bottom: none;
+}
+
+.bracket-team-row--winner {
+  background: rgba(6, 59, 39, 0.06);
+  color: #063b27;
+  font-weight: 700;
+}
+
+.bracket-team-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bracket-advance {
+  font-size: 0.55rem;
+  color: #059669;
+}
+
+.bracket-flag {
+  width: 1.35rem;
+  height: 0.95rem;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.bracket-flag--lg {
+  width: 2.25rem;
+  height: 1.5rem;
+}
+
+.bracket-flag-emoji {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.bracket-flag-emoji--lg {
+  font-size: 1.75rem;
+}
+
+.bracket-flag-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 0.95rem;
+  border-radius: 2px;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 0.55rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.bracket-flag-fallback--lg {
+  width: 2.25rem;
+  height: 1.5rem;
+  font-size: 0.7rem;
+}
+
+.bracket-score {
+  font-size: 0.78rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #374151;
+  min-width: 1rem;
+  text-align: center;
+}
+
+.bracket-team-row--winner .bracket-score {
+  color: #063b27;
+}
+
+.bracket-final-score {
+  text-align: center;
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #ccff00;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0 0.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.bracket-connector {
+  position: absolute;
+  border-color: #d1d5db;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bracket-connector--qf-left {
+  right: -14px;
+  top: 22%;
+  bottom: 22%;
+  width: 14px;
+  border-right: 2px solid #d1d5db;
+  border-top: 2px solid #d1d5db;
+  border-bottom: 2px solid #d1d5db;
+  border-radius: 0 8px 8px 0;
+}
+
+.bracket-connector--qf-right {
+  left: -14px;
+  top: 22%;
+  bottom: 22%;
+  width: 14px;
+  border-left: 2px solid #d1d5db;
+  border-top: 2px solid #d1d5db;
+  border-bottom: 2px solid #d1d5db;
+  border-radius: 8px 0 0 8px;
+}
+
+.bracket-connector--sf-left {
+  right: -14px;
+  top: 50%;
+  width: 14px;
+  border-bottom: 2px solid #d1d5db;
+}
+
+.bracket-connector--sf-right {
+  left: -14px;
+  top: 50%;
+  width: 14px;
+  border-bottom: 2px solid #d1d5db;
+}
+
+.bracket-trophy-wrap {
+  margin-bottom: 0.5rem;
+}
+
+.bracket-trophy {
+  width: 4.5rem;
+  height: auto;
+  animation: trophyGlow 2.5s ease-in-out infinite;
+}
+
+.bracket-final-card {
+  width: 100%;
+  background: linear-gradient(180deg, #063b27 0%, #0a5c3e 100%);
+  border: 2px solid #ccff00;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(6, 59, 39, 0.35);
+  color: #fff;
+}
+
+.bracket-final-card__meta {
+  background: rgba(0, 0, 0, 0.25);
+  text-align: center;
+  font-size: 0.58rem;
+  font-family: ui-monospace, monospace;
+  color: #ccff00;
+  padding: 0.35rem 0.5rem;
+  letter-spacing: 0.04em;
+}
+
+.bracket-final-teams {
+  padding: 0.85rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bracket-final-team {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.35rem;
+  border-radius: 0.4rem;
+  opacity: 0.75;
+}
+
+.bracket-final-team--champ {
+  opacity: 1;
+  background: rgba(204, 255, 0, 0.12);
+  border: 1px solid rgba(204, 255, 0, 0.35);
+  font-size: 0.9rem;
+}
+
+.bracket-final-vs {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.15em;
+}
+
+.bracket-crown {
+  font-size: 0.85rem;
+}
+
+.bracket-champion-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  background: linear-gradient(90deg, #ecfdf5, #fff);
+  border: 1px solid #a7f3d0;
+  border-radius: 0.65rem;
+  width: 100%;
+  text-align: left;
+}
+
+.bracket-champion-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #059669;
+}
+
+.bracket-champion-name {
+  display: block;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #063b27;
+}
+
+.bracket-reasoning {
+  margin-top: 0.75rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #6b7280;
+  font-style: italic;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .bracket-header {
+    flex-direction: column;
+  }
+
+  .bracket-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}

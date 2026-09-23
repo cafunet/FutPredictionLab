@@ -1,0 +1,27 @@
+server:
+  port: ${SERVER_PORT:8081}
+  servlet:
+    context-path: /api/v1
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    # La contraseña se inyecta por variable de entorno o usa el valor por defecto
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
+prediction:
+  llm:
+    base-url: ${PREDICTION_LLM_BASE_URL:http://localhost:8080}
+    enabled: ${PREDICTION_LLM_ENABLED:true}

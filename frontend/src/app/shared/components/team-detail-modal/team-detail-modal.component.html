@@ -1,0 +1,94 @@
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4" (click)="onBackdropClick($event)">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-fade-in-up">
+    <!-- Header con gradient -->
+    <div class="bg-gradient-to-r from-gray-900 to-gray-800 p-6 relative overflow-hidden">
+      <div class="absolute -right-10 -top-10 text-[120px] opacity-10 font-black whitespace-nowrap">{{ team.flag || team.name }}</div>
+      <button (click)="close()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-20">
+        <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <div class="relative z-10 flex items-center gap-4 text-white pr-8">
+        @if (team.banderaUrl) {
+          <img [src]="team.banderaUrl" [alt]="team.name" class="w-20 h-14 object-cover rounded shadow-md shrink-0 border border-white/20">
+        } @else if (team.flag && team.flag !== team.name) {
+          <div class="text-6xl shrink-0">{{ team.flag }}</div>
+        }
+        <div class="min-w-0 flex-1">
+          <h2 class="text-3xl font-black">{{ team.name }}</h2>
+          <div class="flex flex-wrap gap-2 mt-1">
+            <span class="bg-[#ccff00] text-[#063b27] text-xs font-bold px-2 py-0.5 rounded shrink-0">
+              Grupo {{ team.group }}
+            </span>
+            <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded border border-white/20 shrink-0">
+              Rank FIFA: #{{ team.fifaRank }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6 relative min-h-[300px]">
+      @if (isLoading()) {
+        <div class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-10 rounded-b-2xl">
+          <div class="w-10 h-10 border-4 border-[#063b27] border-t-transparent rounded-full animate-spin mb-4"></div>
+          <span class="text-sm font-bold text-gray-500 animate-pulse">Consultando plantilla en API-Football...</span>
+        </div>
+      }
+
+      <div class="mb-6 text-sm bg-gray-50 p-3 rounded-lg border border-gray-100 flex items-center gap-3">
+        <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-lg shrink-0">👔</div>
+        <div>
+          <span class="text-gray-500 text-xs block uppercase tracking-wider font-bold">Entrenador</span>
+          <span class="font-bold text-gray-800 text-base">{{ team.manager || 'No disponible' }}</span>
+        </div>
+      </div>
+
+      <h4 class="font-bold text-gray-700 border-b pb-2 mb-3 flex items-center justify-between">
+        <span>Plantilla Oficial</span>
+        <span class="text-xs font-normal text-gray-500 flex items-center gap-2">
+          {{ team.players?.length || 0 }} jugadores
+          @if (fromCache()) {
+            <span class="text-emerald-600 font-semibold" title="Datos guardados localmente para ahorrar consultas">● Caché</span>
+          }
+        </span>
+      </h4>
+      @if (loadFailed() && !isLoading()) {
+        <div class="text-center py-6 text-gray-500 text-sm bg-amber-50 border border-amber-100 rounded-lg mb-2">
+          No se encontró plantilla para este equipo en API-Football.
+        </div>
+      }
+      <div class="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-2">
+        @for (player of team.players; track player.name) {
+          <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border border-gray-100 hover:border-gray-300 transition-colors">
+            <div class="flex items-center gap-3">
+              @if (player.photo) {
+                <img [src]="player.photo" [alt]="player.name" class="w-10 h-10 object-cover rounded-full bg-white border border-gray-200 shadow-sm shrink-0">
+              } @else {
+                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs shrink-0 border border-gray-300">N/A</div>
+              }
+              <div class="flex flex-col">
+                <div class="flex items-center gap-1">
+                  <span class="font-semibold text-sm text-gray-800">{{ player.name }}</span>
+                  @if (player.isStar) {
+                    <span class="text-yellow-500 text-[10px]" title="Jugador Estrella">⭐</span>
+                  }
+                </div>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 bg-gray-200 text-gray-600 rounded inline-block w-fit mt-0.5">
+                  {{ player.position }}
+                </span>
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-0.5">
+              <span class="text-[10px] text-gray-400 font-bold">OVR</span>
+              <span class="text-sm font-black" [class]="player.rating >= 85 ? 'text-emerald-600' : 'text-blue-600'">
+                {{ player.rating }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

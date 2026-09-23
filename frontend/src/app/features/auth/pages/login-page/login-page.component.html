@@ -1,0 +1,120 @@
+<div class="flex-grow flex bg-gray-50 animate-fade-in-up min-h-[calc(100vh-64px)]">
+  <!-- Hero Visual -->
+  <div class="hidden lg:flex w-1/2 bg-[#063b27] relative overflow-hidden items-center justify-center">
+    <div class="absolute inset-0 opacity-20 pattern-dots text-white"></div>
+    <div class="absolute inset-0 bg-gradient-to-tr from-[#063b27] via-[#0a5c3e] to-transparent"></div>
+    <div class="relative z-10 p-12 text-white">
+      <div class="mb-8">
+        <h1 class="text-5xl font-black mb-4">Acceso <span class="text-[#ccff00]">PRO</span></h1>
+        <p class="text-emerald-200 text-lg max-w-md">
+          Ingresa para consultar las predicciones detalladas, estadísticas H2H y guardar tu historial en el sistema.
+        </p>
+      </div>
+      <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 inline-block shadow-lg">
+        <p class="text-sm font-mono text-[#ccff00] mb-2 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+          Una experiencia inolvidable
+        </p>
+        <p class="text-sm"><b class="tracking-wide">Únete a nosotros</b></p>
+        <p class="text-sm"><b class="tracking-wide">Una forma diferente y profesional</b></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-72 h-72 bg-[#ccff00] rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob"></div>
+    <div class="absolute bottom-0 left-0 w-72 h-72 bg-[#063b27] rounded-full mix-blend-multiply filter blur-[80px] opacity-10 animate-blob animation-delay-2000"></div>
+
+    <div class="w-full max-w-md relative z-10 bg-white/90 backdrop-blur-xl p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-black text-[#063b27] mb-2">Bienvenido de nuevo</h2>
+        <p class="text-gray-500 text-sm font-medium">Ingresa tus credenciales de FutPredictionPro.</p>
+      </div>
+
+      @if (loginError()) {
+        <div class="bg-red-50 text-red-600 p-4 rounded-xl text-sm mb-6 border border-red-200 flex items-center gap-2 font-medium">
+          <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+          {{ loginError() }}
+        </div>
+      }
+
+      <div class="space-y-5">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Usuario / Email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+            </div>
+            <input #loginUserInput type="text"
+              class="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:bg-white focus:ring-2 focus:ring-[#ccff00] focus:border-[#063b27] outline-none transition-all text-gray-800 font-medium"
+              placeholder="tu@email.com"
+              (keyup.enter)="doLogin(loginUserInput.value, loginPassInput.value)">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Contraseña</label>
+            <a href="#" class="text-xs font-bold text-[#063b27] hover:text-emerald-600 transition-colors">¿Olvidaste tu clave?</a>
+          </div>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors group-focus-within:text-[#063b27]">
+              <svg class="h-5 w-5 text-gray-400 group-focus-within:text-[#063b27]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <input #loginPassInput [type]="showPassword() ? 'text' : 'password'"
+              class="w-full pl-10 pr-12 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:bg-white focus:ring-2 focus:ring-[#ccff00] focus:border-[#063b27] outline-none transition-all text-gray-800 font-medium"
+              placeholder="••••••••"
+              (keyup.enter)="doLogin(loginUserInput.value, loginPassInput.value)">
+            <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-[#063b27] transition-colors focus:outline-none">
+              @if (showPassword()) {
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              } @else {
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <button (click)="doLogin(loginUserInput.value, loginPassInput.value)"
+          class="w-full bg-[#063b27] text-[#ccff00] font-black text-lg py-3.5 px-4 rounded-xl hover:bg-emerald-900 transition-all shadow-[0_4px_14px_0_rgba(6,59,39,0.25)] hover:shadow-[0_6px_20px_rgba(6,59,39,0.4)] hover:-translate-y-0.5 mt-2 flex justify-center items-center gap-2">
+          <span>Ingresar al Sistema</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </button>
+
+        <div class="relative flex py-2 items-center">
+          <div class="flex-grow border-t border-gray-200"></div>
+          <span class="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase tracking-wider">O continúa con</span>
+          <div class="flex-grow border-t border-gray-200"></div>
+        </div>
+
+        <!-- Google Sign-In Button Container -->
+        <div class="w-full flex justify-center">
+          <div #googleBtnRef class="w-full max-w-[300px]"></div>
+        </div>
+
+        <div class="text-center mt-6">
+          <p class="text-sm text-gray-600 font-medium">
+            ¿No tienes cuenta?
+            <a routerLink="/auth/register" class="text-[#063b27] font-black hover:underline">Regístrate aquí</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

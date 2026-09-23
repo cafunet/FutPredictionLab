@@ -1,0 +1,74 @@
+<nav class="bg-[#063b27] text-white shadow-lg sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+
+      <!-- Logo -->
+      <a routerLink="/" class="flex items-center cursor-pointer">
+        <svg class="w-8 h-8 text-[#ccff00] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9">
+          </path>
+        </svg>
+        <span class="font-bold text-xl tracking-tight">
+          Fut<span class="text-[#ccff00]">Prediction</span>
+          <span class="text-xs text-gray-400 ml-1 font-mono">PRO</span>
+        </span>
+      </a>
+
+      <!-- Nav Links (Desktop) -->
+      <div class="hidden md:flex space-x-8">
+        <a routerLink="/" routerLinkActive="text-[#ccff00]" [routerLinkActiveOptions]="{exact: true}"
+          class="hover:text-[#ccff00] transition-colors cursor-pointer font-medium flex items-center gap-1">
+          Inicio
+        </a>
+
+        @if (auth.isAuthenticated()) {
+          <a routerLink="/predict" routerLinkActive="text-[#ccff00]"
+            class="hover:text-[#ccff00] transition-colors cursor-pointer font-medium flex items-center gap-1">
+            <span class="text-blue-400">⚡</span> IA Oráculo
+          </a>
+          <a routerLink="/history" routerLinkActive="text-[#ccff00]"
+            class="hover:text-[#ccff00] transition-colors cursor-pointer font-medium">
+            Mi Historial
+          </a>
+        }
+
+        @if (auth.isAdmin()) {
+          <a routerLink="/admin" routerLinkActive="text-purple-300"
+            class="text-purple-400 hover:text-purple-300 transition-colors cursor-pointer font-bold border-b-2 border-purple-400">
+            Panel Admin
+          </a>
+        }
+      </div>
+
+      <!-- Auth Buttons -->
+      <div class="flex items-center space-x-4">
+        @if (!auth.isAuthenticated()) {
+          <a routerLink="/auth/login"
+            class="text-sm font-medium hover:text-gray-300 transition-colors cursor-pointer">
+            Ingresar
+          </a>
+          <a routerLink="/auth/register"
+            class="bg-[#ccff00] text-[#063b27] px-4 py-2 rounded-full text-sm font-bold hover:bg-[#b3e600] transition-all shadow-[0_0_15px_rgba(204,255,0,0.4)] cursor-pointer">
+            Regístrate
+          </a>
+        } @else {
+          <div class="flex items-center gap-3">
+            <div class="text-right hidden sm:block">
+              <div class="text-xs font-bold text-white">{{ auth.displayName() }}</div>
+              <div class="text-[10px] text-[#ccff00]">{{ auth.userRole() }}</div>
+            </div>
+            <div class="bg-emerald-800 rounded-full h-8 w-8 flex items-center justify-center border-2 border-[#ccff00]">
+              <span class="text-xs font-bold">{{ auth.isAdmin() ? 'AD' : 'US' }}</span>
+            </div>
+            <button (click)="logout()"
+              class="text-xs text-gray-300 hover:text-white ml-2 border border-gray-600 px-2 py-1 rounded">
+              Salir
+            </button>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+</nav>
