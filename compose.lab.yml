@@ -1,0 +1,80 @@
+name: futprediction-lab-stages
+
+x-database: &database
+  image: postgres:16-alpine
+  environment:
+    POSTGRES_DB: predicciones_db
+    POSTGRES_USER: ${DB_USERNAME:?Falta DB_USERNAME}
+    POSTGRES_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD}
+  healthcheck:
+    test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+    interval: 5s
+    timeout: 5s
+    retries: 15
+
+x-app: &app
+  image: eclipse-temurin:17-jre
+  working_dir: /app
+  command: [java, -jar, /app/app.jar]
+  env_file: ./backend_proyecto/.env
+  volumes:
+    - type: bind
+      source: ${LAB_JAR_PATH:?Ejecuta primero el build del laboratorio}
+      target: /app/app.jar
+      read_only: true
+
+x-environment: &environment
+  SERVER_PORT: '8081'
+  PREDICTION_LLM_ENABLED: 'false'
+
+services:
+  dev-db:
+    <<: *database
+    volumes:
+      - dev-data:/var/lib/postgresql/data
+      - ./backend_proyecto/db/schema_actual.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+  qa-db:
+    <<: *database
+    volumes:
+      - qa-data:/var/lib/postgresql/data
+      - ./backend_proyecto/db/schema_actual.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+  pdn-db:
+    <<: *database
+    volumes:
+      - pdn-data:/var/lib/postgresql/data
+      - ./backend_proyecto/db/schema_actual.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+  dev:
+    <<: *app
+    ports: ['127.0.0.1:8082:8081']
+    environment:
+      <<: *environment
+      APP_ENVIRONMENT: DEV
+      DB_URL: jdbc:postgresql://dev-db:5432/predicciones_db
+    depends_on:
+      dev-db:
+        condition: service_healthy
+  qa:
+    <<: *app
+    ports: ['127.0.0.1:8083:8081']
+    environment:
+      <<: *environment
+      APP_ENVIRONMENT: QA
+      DB_URL: jdbc:postgresql://qa-db:5432/predicciones_db
+    depends_on:
+      qa-db:
+        condition: service_healthy
+  pdn:
+    <<: *app
+    ports: ['127.0.0.1:8084:8081']
+    environment:
+      <<: *environment
+      APP_ENVIRONMENT: PDN
+      DB_URL: jdbc:postgresql://pdn-db:5432/predicciones_db
+    depends_on:
+      pdn-db:
+        condition: service_healthy
+
+volumes:
+  dev-data:
+  qa-data:
+  pdn-data:
