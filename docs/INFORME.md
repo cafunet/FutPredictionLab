@@ -25,7 +25,7 @@ demostracion local complementaria. GitHub Actions se identifica como otra plataf
 - API-Sports movida al backend; consulta real respondio HTTP 200.
 - Repositorio propio con ramas main y develop publicadas; rama feature creada.
 
-## Automatizacion implementada, pendiente de registrar su ejecucion
+## Automatización local ejecutada y validada
 
 El endpoint `/api/v1/hello` expone mensaje, ambiente, version y commit. El ambiente
 se inyecta al ejecutar el proceso. La version y el commit se incorporan al JAR con
@@ -36,22 +36,50 @@ con SHA-256. Los ambientes DEV, QA y PDN reciben el mismo archivo. La verificaci
 local compara la respuesta HTTP y el hash calculado dentro de cada contenedor.
 QA exige DEV validado; PDN exige QA validado y una confirmacion explicita local.
 
-| Evidencia nueva | Estado en este borrador |
+| Evidencia | Estado verificado |
 | --- | --- |
-| 24 pruebas Java y 13 Angular | Pendiente de ejecutar y confirmar |
-| CI complementaria GitHub y artefacto | Pendiente de ejecucion; registrar URL |
-| DEV local, puerto 8082 | Pendiente de validacion |
-| QA local, puerto 8083 | Pendiente de validacion |
-| PDN local, puerto 8084 | Pendiente de validacion |
-| Confirmacion local de PDN | Pendiente; no equivale a Azure Approvals |
+| 24 pruebas Java y 13 Angular | Aprobadas en el build local; JAR y compilación Angular generados |
+| CI complementaria GitHub | Ejecución número 1 correcta para cfc3e07 en feature/laboratorio-ci-cd; captura adjunta |
+| DEV local, puerto 8082 | Validado el 23/09/2026 a las 18:46:04 UTC−05 |
+| QA local, puerto 8083 | Validado el 23/09/2026 a las 18:48:05 UTC−05 |
+| PDN local, puerto 8084 | Validado el 23/09/2026 a las 18:51:25 UTC−05 |
+| Confirmación local de PDN | Registrada en approval-local.json; no equivale a Azure Approvals |
 | PR feature -> develop -> main | Pendiente; registrar URLs |
 | YAML Azure | Preparado; pendiente de ejecutar en Azure |
 | Despliegues y aprobacion Azure | Pendientes por falta de acceso |
 
-Actualizar esta tabla solo con resultados comprobados. Adjuntar los JSON generados
-y las capturas reales. El detalle de ejecucion esta en `LABORATORIO.md`.
+Las evidencias locales se incluyen en `docs/evidencias/local`. Los Pull Requests
+siguen pendientes de integración. La captura de GitHub Actions confirma la ejecución número 1 correcta (1 min 20 s). El enlace disponible es https://github.com/cafunet/FutPredictionLab/actions; falta registrar el enlace específico de la ejecución.
+El detalle de ejecución está en `LABORATORIO.md`.
 
-## Preguntas de reflexion
+
+## Trazabilidad del artefacto validado
+
+- Versión: `local-20260923-180437-cfc3e074`.
+- Commit del código construido: `cfc3e07414f2e5f993fded7c328bcd16459335e4`.
+- Artefacto: `app.jar`.
+- SHA-256: `cb6754d3939aa69cacee2da157e363cf0e0a41d1bdbe74590223b6a70e0b97a1`.
+
+Los registros DEV.json, QA.json y PDN.json contienen exactamente esos mismos
+valores. El verificador calculó el hash dentro de cada contenedor, además de
+comprobar la respuesta de `/api/v1/hello`. La configuración del ambiente cambió;
+el archivo ejecutable se conservó sin recompilar.
+
+La confirmación de PDN fue realizada localmente por el usuario `juanp` y quedó
+registrada antes de la validación de PDN. Es una confirmación del operador; no se
+presenta como aprobación independiente ni como control de Azure DevOps.
+
+![Build local completado](evidencias/local/ci-local.png)
+
+![Validación de DEV QA y PDN](evidencias/local/ambientes-locales.png)
+
+![CI de GitHub Actions completada](evidencias/local/github-actions.png)
+
+La CI de GitHub genera otro build con su propio
+identificador y hash. No se afirma que ese artefacto sea el utilizado en esta
+demostración local.
+
+## Preguntas de reflexión
 
 ### 1. Diferencia entre CI y CD
 
