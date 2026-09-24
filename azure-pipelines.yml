@@ -1,0 +1,77 @@
+# Preparado para Azure DevOps. No se ha ejecutado en Azure.
+name: $(Date:yyyyMMdd).$(Rev:r)
+trigger:
+  branches:
+    include: [main, develop]
+pr:
+  branches:
+    include: [main, develop]
+
+parameters:
+- name: deployToAzure
+  displayName: 'Desplegar en Azure (requiere recursos y aprobacion PDN configurados)'
+  type: boolean
+  default: false
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: CI
+  displayName: Pruebas y construccion unica
+  jobs:
+  - job: BuildAndTest
+    steps:
+    - checkout: self
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: x64
+        jdkSourceOption: PreInstalled
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '22.x'
+    - bash: >-
+        mvn -B -ntp -f backend_proyecto/pom.xml
+        -Dlab.build.version=azure-$(Build.BuildId)
+        -Dlab.build.commit=$(Build.SourceVersion) clean verify
+      displayName: Probar Java y construir JAR
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: JUnit
+        testResultsFiles: 'backend_proyecto/target/surefire-reports/TEST-*.xml'
+        failTaskOnFailedTests: true
+        failTaskOnMissingResultsFile: true
+    - bash: |
+        set -euo pipefail
+        npm ci
+        npm test -- --watch=false
+        npm run build -- --configuration docker
+      workingDirectory: frontend
+      displayName: Probar y compilar Angular
+    - bash: >-
+        python3 scripts/package_release.py
+        --output "$(Build.ArtifactStagingDirectory)/futprediction"
+        --version "azure-$(Build.BuildId)"
+        --commit "$(Build.SourceVersion)"
+      displayName: Preparar artefacto y huella SHA-256
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)/futprediction'
+        artifact: futprediction
+
+# Se incluyen solo cuando ya existen los recursos documentados.
+- ${{ if eq(parameters.deployToAzure, true) }}:
+  - template: .azure/deploy-stage.yml
+    parameters:
+      environment: DEV
+      dependsOn: CI
+  - template: .azure/deploy-stage.yml
+    parameters:
+      environment: QA
+      dependsOn: DEV
+  - template: .azure/deploy-stage.yml
+    parameters:
+      environment: PDN
+      dependsOn: QA
